@@ -1,11 +1,11 @@
 bl_info = {
     "name": "Long Exposure Effect",
-    "author": "",  # NemAron <nemetharon95@gmail.com>
+    "author": "aaron",
     "description": "Creates a long exposure effect for the selected script",
     "version": (0, 1),
     "blender": (3, 1, 0),
     "location": "Sequencer -> Strip",
-    "warning": "Want's your RAM more than Chrome",  # used for warning icon and text in addons panel
+    "warning": "Want's your RAM more than Chrome",
     "wiki_url": "",
     "category": "Sequencer",
 }
@@ -60,12 +60,27 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
         max=1,
     )
 
+    fade_in: bpy.props.BoolProperty(
+        name="Fade In",
+        description="Effects starts gradually",
+        default=True,
+    )
+
+    fade_out: bpy.props.BoolProperty(
+        name="Fade Out",
+        description="Effects stops gradually",
+        default=True,
+    )
+
     def execute(self, context):
         if bpy.context.area.type != "SEQUENCE_EDITOR":
             return {"CANCELLED"}
 
-        bpy.ops.sequencer.lock()
         original = bpy.context.scene.sequence_editor.active_strip
+        # Make sure only the active strip is selected:
+        bpy.ops.sequencer.select_all(action="DESELECT")
+        original.select = True
+        bpy.context.scene.sequence_editor.active_strip = original
 
         # Create and shift duplicates
         created_strips = []
@@ -82,7 +97,7 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
                 break
 
         # Select created strips
-        bpy.ops.object.select_all(action="DESELECT")
+        bpy.ops.sequencer.select_all(action="DESELECT")
         for i in created_strips:
             i.select = True
         original.select = True
@@ -90,6 +105,24 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
 
         # make meta strip
         bpy.ops.sequencer.meta_make()
+
+        if not self.fade_in:
+            meta_strip = bpy.context.scene.sequence_editor.active_strip
+            bpy.ops.sequencer.select_all(action="DESELECT")
+            meta_strip.select = True
+            meta_strip.select_left_handle = True
+            bpy.ops.transform.seq_slide(value=(self.levels, 0))
+            original.select = True
+            bpy.ops.sequencer.select_all(action="DESELECT")
+            meta_strip.select = True
+            bpy.ops.transform.seq_slide(value=(-self.levels, 0))
+
+        if not self.fade_out:
+            meta_strip = bpy.context.scene.sequence_editor.active_strip
+            bpy.ops.sequencer.select_all(action="DESELECT")
+            meta_strip.select = True
+            meta_strip.select_right_handle = True
+            bpy.ops.transform.seq_slide(value=(-self.levels, 0))
 
         return {"FINISHED"}
 

@@ -14,7 +14,7 @@ import bpy
 
 
 class SEQUENCER_PT_long_exposure(bpy.types.Panel):
-    bl_label = "Long Exposure"
+    bl_label = "Long Exposure Effect"
     bl_category = "Strip"
     bl_space_type = "SEQUENCE_EDITOR"
     bl_region_type = "UI"
@@ -82,8 +82,9 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
         original.select = True
         bpy.context.scene.sequence_editor.active_strip = original
 
-        # Create and shift duplicates
+        # List of created strips
         created_strips = []
+        # Create and shift duplicates, set opacity
         for _ in range(self.levels):
             bpy.ops.sequencer.duplicate_move(
                 SEQUENCER_OT_duplicate={}, TRANSFORM_OT_seq_slide={"value": (1, 1)}
@@ -107,17 +108,19 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
         bpy.ops.sequencer.meta_make()
 
         if not self.fade_in:
+            # Re,pve the first frames as the effect fades in
             meta_strip = bpy.context.scene.sequence_editor.active_strip
             bpy.ops.sequencer.select_all(action="DESELECT")
             meta_strip.select = True
             meta_strip.select_left_handle = True
             bpy.ops.transform.seq_slide(value=(self.levels, 0))
-            original.select = True
+            # Move the whole strip forward
             bpy.ops.sequencer.select_all(action="DESELECT")
             meta_strip.select = True
             bpy.ops.transform.seq_slide(value=(-self.levels, 0))
 
         if not self.fade_out:
+            # Remove the last frames as the effect fades out
             meta_strip = bpy.context.scene.sequence_editor.active_strip
             bpy.ops.sequencer.select_all(action="DESELECT")
             meta_strip.select = True
@@ -134,4 +137,4 @@ def register():
 
 def unregister():
     bpy.utils.unregister_class(SEQUENCER_OT_long_expo_effect)
-    bpy.utils.register_class(SEQUENCER_PT_long_exposure)
+    bpy.utils.unegister_class(SEQUENCER_PT_long_exposure)

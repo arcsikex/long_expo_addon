@@ -1,10 +1,10 @@
 # LONG EXPOSURE Video Effect
 This addon lets you create a long exposure effect in Blende Video Sequence Editor.
-The workflow is the same as descirbed in Aidin Robbins [LONG EXPOSURE Video Effect](https://youtu.be/H2SYdgMDvMM) video.
+The workflow is the same as descirbed in Aidin Robbins' [LONG EXPOSURE Video Effect](https://youtu.be/H2SYdgMDvMM) video.
 
 
 # Installation
-1. Download the [longe_expo_effect.py](long_expo_effect.py) file
+1. Download the [long_expo_effect.py](longe_expo_effect.py) file
 2. In Blender go to Edit -> Preferences -> Add-ons ->Install
 3. Select the downloaded file
 

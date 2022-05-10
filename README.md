@@ -12,7 +12,7 @@ The workflow is the same as descirbed in Aidin Robbins' [LONG EXPOSURE Video Eff
 1. Select a **video strip**
 2. Open up the **Strip** Panel
 3. Search for **Long Exposure Effect** panel
-4. Click the button
+4. Click one of the buttons
 5. Change the properties on the redo panel
 
 ## Properties:
@@ -20,6 +20,7 @@ The workflow is the same as descirbed in Aidin Robbins' [LONG EXPOSURE Video Eff
 - Levels: The number of duplicated strips, the higher the value the more you can see the effect. But **it can slow down your scene significantly**. (I recommend to set it to ~40-50)
 - Opacity: Opacity of the duplicated layers (you should keep it around 0.05)
 - Fade In / Fade Out: Start/End the effect gradually. If they are unchecked the beginning/end will be cut off
+- Comet Mode: Gradually decreases the opacity of the layers.
 
 ## Hint
 To improve playback performance in the Preview window got to **View -> View Settings -> Proxy render Size ->** Set it to **25%**

@@ -30,18 +30,19 @@ class SEQUENCER_PT_long_exposure(bpy.types.Panel):
         return strip.type != "SOUND"
 
     def draw(self, context):
-        default = self.layout.operator(
+        col = self.layout.column()
+        default = col.operator(
             "sequencer.long_exposure_effect",
-            text="Long Exposure Effect",
-            icon="OUTLINER_OB_CAMERA",
+            text="Long Exposure Water",
+            icon="OUTLINER_OB_FORCE_FIELD",
         )
         default.opacity = 0.05
         default.mode = "ALPHA_OVER"
 
-        star_trails = self.layout.operator(
+        star_trails = col.operator(
             "sequencer.long_exposure_effect",
-            text="Star Trails (Lighten)",
-            icon="MOD_THICKNESS",
+            text="Star Trails",
+            icon="MOD_WAVE",
         )
         star_trails.opacity = 1
         star_trails.mode = "LIGHTEN"

@@ -30,11 +30,21 @@ class SEQUENCER_PT_long_exposure(bpy.types.Panel):
         return strip.type != "SOUND"
 
     def draw(self, context):
-        self.layout.operator(
+        default = self.layout.operator(
             "sequencer.long_exposure_effect",
             text="Long Exposure Effect",
             icon="OUTLINER_OB_CAMERA",
         )
+        default.opacity = 0.05
+        default.mode = "ALPHA_OVER"
+
+        star_trails = self.layout.operator(
+            "sequencer.long_exposure_effect",
+            text="Star Trails (Lighten)",
+            icon="MOD_THICKNESS",
+        )
+        star_trails.opacity = 1
+        star_trails.mode = "LIGHTEN"
 
 
 class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
@@ -72,6 +82,19 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
         default=True,
     )
 
+    comet_mode: bpy.props.BoolProperty(
+        name="Comet Mode",
+        description="Opacity decreases gradually",
+        default=False,
+    )
+
+    mode: bpy.props.StringProperty(
+        name="Blend type",
+        description="Blend mode of strips",
+        default="ALPHA_OVER",
+        options={"HIDDEN"},
+    )
+
     def execute(self, context):
         if bpy.context.area.type != "SEQUENCE_EDITOR":
             return {"CANCELLED"}
@@ -85,12 +108,17 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
         # List of created strips
         created_strips = []
         # Create and shift duplicates, set opacity
-        for _ in range(self.levels):
+        for i in range(1, self.levels):
             bpy.ops.sequencer.duplicate_move(
                 SEQUENCER_OT_duplicate={}, TRANSFORM_OT_seq_slide={"value": (1, 1)}
             )
             current = bpy.context.active_sequence_strip
-            current.blend_alpha = self.opacity
+            current.blend_type = self.mode
+            if self.comet_mode:
+                opacity = self.opacity - i / self.levels
+            else:
+                opacity = self.opacity
+            current.blend_alpha = opacity
             created_strips.append(current)
 
             if current.channel == 128:

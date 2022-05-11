@@ -101,7 +101,6 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
             return {"CANCELLED"}
 
         original = bpy.context.scene.sequence_editor.active_strip
-        end_frame = original.frame_final_end
         # Make sure only the active strip is selected:
         bpy.ops.sequencer.select_all(action="DESELECT")
         original.select = True
@@ -147,14 +146,6 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
         if self.fade_out:
             # Increase the meta strip lenght
             meta_strip.frame_final_end += self.levels
-
-        if end_frame < meta_strip.frame_final_end:
-            """
-            If there is another strip behind it's better to move upone channel.
-            Otherwise it would move on x axis.
-            Not elegant but it works.
-            """
-            meta_strip.channel += 1
 
         return {"FINISHED"}
 

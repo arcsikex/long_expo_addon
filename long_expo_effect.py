@@ -1,11 +1,11 @@
 bl_info = {
-    "name": "Long Exposure Effect",
+    "name": "Long Exposure Video Effect",
     "author": "aaron",
     "description": "Creates a long exposure effect for the selected script",
-    "version": (0, 1),
+    "version": (1, 0),
     "blender": (3, 1, 0),
     "location": "Sequencer -> Strip",
-    "warning": "Want's your RAM more than Chrome",
+    "warning": "Can use a lot of RAM. Save your scene before using it!",
     "wiki_url": "",
     "category": "Sequencer",
 }
@@ -106,35 +106,32 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
         original.select = True
         bpy.context.scene.sequence_editor.active_strip = original
 
-        # List of created strips
-        created_strips = []
-        # Create and shift duplicates, set opacity
+        # Make meta strip
+        bpy.ops.sequencer.meta_make()
+        bpy.ops.sequencer.meta_toggle()
+        original.select = True
+        bpy.context.scene.sequence_editor.active_strip = original
+
+        # Create and shift duplicates by 1 frame
         for i in range(1, self.levels):
             bpy.ops.sequencer.duplicate_move(
                 SEQUENCER_OT_duplicate={}, TRANSFORM_OT_seq_slide={"value": (1, 1)}
             )
             current = bpy.context.active_sequence_strip
             current.blend_type = self.mode
+            # Set opacity
             if self.comet_mode:
                 opacity = self.opacity - i / self.levels
             else:
                 opacity = self.opacity
             current.blend_alpha = opacity
-            created_strips.append(current)
 
             if current.channel == 128:
                 # Max number of channels reached
                 break
 
-        # Select created strips
-        bpy.ops.sequencer.select_all(action="DESELECT")
-        for i in created_strips:
-            i.select = True
-        original.select = True
-        bpy.context.scene.sequence_editor.active_strip = original
-
-        # make meta strip
-        bpy.ops.sequencer.meta_make()
+        # Exit from meta strip
+        bpy.ops.sequencer.meta_toggle()
 
         if not self.fade_in:
             # Re,pve the first frames as the effect fades in
@@ -148,13 +145,13 @@ class SEQUENCER_OT_long_expo_effect(bpy.types.Operator):
             meta_strip.select = True
             bpy.ops.transform.seq_slide(value=(-self.levels, 0))
 
-        if not self.fade_out:
-            # Remove the last frames as the effect fades out
+        if self.fade_out:
+            # Increase the meta strip lenght
             meta_strip = bpy.context.scene.sequence_editor.active_strip
             bpy.ops.sequencer.select_all(action="DESELECT")
             meta_strip.select = True
             meta_strip.select_right_handle = True
-            bpy.ops.transform.seq_slide(value=(-self.levels, 0))
+            bpy.ops.transform.seq_slide(value=(self.levels, 0))
 
         return {"FINISHED"}
 
